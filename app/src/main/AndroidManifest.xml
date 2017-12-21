@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="lee.yuzer.com.weatherdemo">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <user-permission android:name="android.permissino.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RESTART_PACKAGES"/>
+
+    <application
+        android:name="org.litepal.LitePalApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="lee.yuzer.com.yuzerweather.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name="lee.yuzer.com.yuzerweather.oldversion.WeatherActivity">
+        </activity>
+        <activity android:name="lee.yuzer.com.yuzerweather.WeatherViewPagerActivity">
+        </activity>
+
+        <service
+            android:name="lee.yuzer.com.yuzerweather.service.AutoUpdateService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="lee.yuzer.com.houtai"/>
+            </intent-filter>
+        </service>
+
+        <activity android:name="lee.yuzer.com.yuzerweather.OptionActivity">
+        </activity>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="cool_weather"/>
+
+    <version value="1"/>
+
+    <list>
+        <mapping class="lee.yuzer.com.yuzerweather.db.Province"/>
+        <mapping class="lee.yuzer.com.yuzerweather.db.City"/>
+        <mapping class="lee.yuzer.com.yuzerweather.db.County"/>
+        <mapping class="lee.yuzer.com.yuzerweather.db.StoredCity"/>
+    </list>
+</litepal>
