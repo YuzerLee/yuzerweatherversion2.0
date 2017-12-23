@@ -65,15 +65,20 @@ public class AutoUpdateService extends Service {
             }
             long triggerAtTime = SystemClock.elapsedRealtime() + RefreshHour;
             Intent i = new Intent(this, AutoUpdateService.class);
-            intent.setAction(SERVICE_START);
+            i.setAction(SERVICE_START);
             //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pi = PendingIntent.getService(this, 0, i, 0);
             manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+
+            //发送更新widget广播
+            Intent intent2 = new Intent();
+            intent2.setAction("lee.yuzer.com.UPDATE_ACTION");
+            sendBroadcast(intent2);
         } else {
             //如果状态为取消，则将闹钟取消
             AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent i = new Intent(this, AutoUpdateService.class);
-            intent.setAction(SERVICE_START);
+            i.setAction(SERVICE_START);
             //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pi = PendingIntent.getService(this, 0, i, 0);
             manager.cancel(pi);

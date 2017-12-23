@@ -19,16 +19,20 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 
 import lee.yuzer.com.weatherdemo.R;
+import lee.yuzer.com.yuzerweather.popupwindow.BasePopupWindow;
+import lee.yuzer.com.yuzerweather.popupwindow.WidgetCityPopupWindow;
 import lee.yuzer.com.yuzerweather.service.AutoUpdateService;
 import lee.yuzer.com.yuzerweather.util.HttpUtil;
 import okhttp3.Call;
@@ -44,16 +48,24 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
     private TextView IntervalTitleText;
     private TextView intervalText;
     public static String SendInfo;
+    public static String WidgetSendInfo;
     private PopupWindow popupWindow;
     private boolean switchstateold;
     private String intervalold;
     private static String SERVICE_START = "lee.yuzer.com.houtai";
+    private TextView widgetCityTextView;
+    private RelativeLayout widgetCityLayout;
 
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            intervalText.setText(msg.obj.toString());
-            SendInfo = msg.obj.toString();
+            if(msg.what == 0){
+                widgetCityTextView.setText(msg.obj.toString());
+                WidgetSendInfo = msg.obj.toString();
+            }else if(msg.what == 1){
+                intervalText.setText(msg.obj.toString());
+                SendInfo = msg.obj.toString();
+            }
         }
     };
 
@@ -80,7 +92,14 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
         intervalText = (TextView) findViewById(R.id.interval_textView);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SendInfo = prefs.getString("selected_text", "未知");
+        WidgetSendInfo = prefs.getString("widgetcity_selected", "未选择");
         intervalText.setText(SendInfo);
+
+        //widgetlayout模块
+        widgetCityLayout = (RelativeLayout) findViewById(R.id.updatewidgetcity_layout);
+        widgetCityTextView = (TextView)findViewById(R.id.widgetcity_textView);
+        widgetCityLayout.setOnClickListener(this);
+        widgetCityTextView.setText(WidgetSendInfo);
 
         //加载背景图片
         String bingPic = prefs.getString("bing_pic", null);
@@ -156,25 +175,40 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        //Toast.makeText(OptionActivity.this, "kkk", Toast.LENGTH_SHORT).show();
-        popupWindow = new BasePopupWindow(this, mHandler);
-        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        popupWindow.setContentView(LayoutInflater.from(this).inflate(R.layout.popupwindow_item, null));
-        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-        popupWindow.setOutsideTouchable(false);
-        popupWindow.setFocusable(true);
-        popupWindow.setAnimationStyle(R.style.popupwindow_anim);
-        FrameLayout parent = (FrameLayout) findViewById(R.id.parent_layout);
-        popupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 50);
+        if(v.getId() == R.id.updatewidgetcity_layout){
+            popupWindow = new WidgetCityPopupWindow(this, mHandler);
+            popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+            popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+            popupWindow.setContentView(LayoutInflater.from(this).inflate(R.layout.widgetcitypopwindow_item, null));
+            popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+            popupWindow.setOutsideTouchable(false);
+            popupWindow.setFocusable(true);
+            popupWindow.setAnimationStyle(R.style.popupwindow_anim);
+            FrameLayout parent = (FrameLayout) findViewById(R.id.parent_layout);
+            popupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 50);
+        }else if(v.getId() == R.id.updateinterval_layout) {
+            //Toast.makeText(OptionActivity.this, "kkk", Toast.LENGTH_SHORT).show();
+            popupWindow = new BasePopupWindow(this, mHandler);
+            popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+            popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+            popupWindow.setContentView(LayoutInflater.from(this).inflate(R.layout.popupwindow_item, null));
+            popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+            popupWindow.setOutsideTouchable(false);
+            popupWindow.setFocusable(true);
+            popupWindow.setAnimationStyle(R.style.popupwindow_anim);
+            FrameLayout parent = (FrameLayout) findViewById(R.id.parent_layout);
+            popupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 50);
+        }
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
+        //Toast.makeText(OptionActivity.this, "resume", Toast.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SendInfo = prefs.getString("selected_text", "未知");
+        WidgetSendInfo = prefs.getString("widgetcity_selected", "未选择");
         //获取用户之前的数据，用于在该activity结束之前进行判断，从而分析用户是否更改了相关设置
         switchstateold = mSwitch.isChecked();
         intervalold = intervalText.getText().toString();
@@ -183,9 +217,17 @@ public class OptionActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onPause() {
         super.onPause();
+        //Toast.makeText(OptionActivity.this, "pause", Toast.LENGTH_SHORT).show();
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(OptionActivity.this).edit();
         editor.putString("selected_text", SendInfo);
+        editor.putString("widgetcity_selected", WidgetSendInfo);
         editor.apply();
+
+        //发送一个更新widget的广播
+        Intent intent2 = new Intent();
+        intent2.setAction("lee.yuzer.com.UPDATE_ACTION");
+        sendBroadcast(intent2);
+
         //判断用户是否在离开该页面之前改变了相关的设置，如果改变了则进行相关的判断，决定是否重新发起服务的使用
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Boolean state = prefs.getBoolean("switch_state", true);

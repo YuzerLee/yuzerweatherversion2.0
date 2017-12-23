@@ -3,7 +3,9 @@
           package="lee.yuzer.com.weatherdemo">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+
     <user-permission android:name="android.permissino.RECEIVE_BOOT_COMPLETED"/>
+
     <uses-permission android:name="android.permission.RESTART_PACKAGES"/>
 
     <application
@@ -22,7 +24,8 @@
         </activity>
         <activity android:name="lee.yuzer.com.yuzerweather.oldversion.WeatherActivity">
         </activity>
-        <activity android:name="lee.yuzer.com.yuzerweather.WeatherViewPagerActivity">
+        <activity android:name="lee.yuzer.com.yuzerweather.WeatherViewPagerActivity"
+            android:launchMode="singleTop">
         </activity>
 
         <service
@@ -36,6 +39,18 @@
 
         <activity android:name="lee.yuzer.com.yuzerweather.OptionActivity">
         </activity>
+
+        <receiver android:name="lee.yuzer.com.yuzerweather.widget.WeatherWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="lee.yuzer.com.CLICK_ATION"/>
+                <action android:name="lee.yuzer.com.UPDATE_ACTION"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info"/>
+        </receiver>
 
     </application>
 

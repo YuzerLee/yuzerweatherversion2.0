@@ -93,6 +93,20 @@ public class WeatherViewPagerActivity extends AppCompatActivity implements ViewP
 
         //ViewPager版本
         initViewPager();
+
+        //判断是不是有widget发起
+        String name = getIntent().getStringExtra("fromwidget");
+        if(name != null){
+            Log.d("name", name);
+            int index = 0;
+            List<StoredCity> ccity = DataSupport.findAll(StoredCity.class);
+            for (StoredCity city : ccity) {
+                if (city.getName().equals(name))
+                    break;
+                index++;
+            }
+            mViewPager.setCurrentItem(index);
+        }
     }
 
     private void initView() {
@@ -110,22 +124,28 @@ public class WeatherViewPagerActivity extends AppCompatActivity implements ViewP
         removeCityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mStoredCities = DataSupport.findAll(StoredCity.class);
-                if (mStoredCities.size() > 1) {
-                    View ViewPagerLayout = MyViewPagerAdatper.mCurrentView;
-                    mStoredCities = DataSupport.where("name = ?", titleCity.getText().toString()).find(StoredCity.class);
-                    DataSupport.deleteAll(StoredCity.class, "name = ?", mStoredCities.get(0).getName());
-                    mViewPagerList.remove(ViewPagerLayout);
-                    mViewPagerList.clear();
-                    LinearLayout containerlayout = (LinearLayout) findViewById(R.id.container_layout);
-                    containerlayout.removeView(mViewPager);
-                    mPagerAdapter = new MyViewPagerAdatper(mViewPagerList);
-                    mViewPager = new ViewPager(WeatherViewPagerActivity.this);
-                    mViewPager.setAdapter(mPagerAdapter);
-                    mViewPager.setOnPageChangeListener(WeatherViewPagerActivity.this);
-                    containerlayout.addView(mViewPager);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherViewPagerActivity.this);
+                String cityname = prefs.getString("widgetcity_selected", "未选择");
+                if(titleCity.getText().equals(cityname)){
+                    Toast.makeText(WeatherViewPagerActivity.this, "你删除的城市是widget的显示城市，删除无效", Toast.LENGTH_SHORT).show();
+                }else{
                     mStoredCities = DataSupport.findAll(StoredCity.class);
-                    showWeatherInfoFromDB(mStoredCities);
+                    if (mStoredCities.size() > 1) {
+                        View ViewPagerLayout = MyViewPagerAdatper.mCurrentView;
+                        mStoredCities = DataSupport.where("name = ?", titleCity.getText().toString()).find(StoredCity.class);
+                        DataSupport.deleteAll(StoredCity.class, "name = ?", mStoredCities.get(0).getName());
+                        mViewPagerList.remove(ViewPagerLayout);
+                        mViewPagerList.clear();
+                        LinearLayout containerlayout = (LinearLayout) findViewById(R.id.container_layout);
+                        containerlayout.removeView(mViewPager);
+                        mPagerAdapter = new MyViewPagerAdatper(mViewPagerList);
+                        mViewPager = new ViewPager(WeatherViewPagerActivity.this);
+                        mViewPager.setAdapter(mPagerAdapter);
+                        mViewPager.setOnPageChangeListener(WeatherViewPagerActivity.this);
+                        containerlayout.addView(mViewPager);
+                        mStoredCities = DataSupport.findAll(StoredCity.class);
+                        showWeatherInfoFromDB(mStoredCities);
+                    }
                 }
             }
         });
@@ -143,6 +163,26 @@ public class WeatherViewPagerActivity extends AppCompatActivity implements ViewP
             Glide.with(this).load(bingPic).into(bingPicImg);
         } else {
             loadBingPic();
+        }
+    }
+
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String name = intent.getStringExtra("fromwidget");
+        if(name != null){
+            Log.d("name", name);
+            int index = 0;
+            List<StoredCity> ccity = DataSupport.findAll(StoredCity.class);
+            for (StoredCity city : ccity) {
+                if (city.getName().equals(name))
+                    break;
+                index++;
+            }
+            mViewPager.setCurrentItem(index);
         }
     }
 

@@ -119,6 +119,50 @@
             android:layout_marginRight="10dp"
             android:background="#fff"/>
 
+        <RelativeLayout
+            android:id="@+id/updatewidgetcity_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                android:id="@+id/widgettitle_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:text="桌面天气"
+                android:textColor="#fff"
+                android:textSize="15sp"/>
+
+            <ImageView
+                android:id="@+id/chevron_imageview2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:background="@mipmap/ic_chevron_right_white_36dp"/>
+
+            <TextView
+                android:id="@+id/widgetcity_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/chevron_imageview2"
+                android:text="未知"
+                android:textColor="#fff"
+                android:textSize="15sp"/>
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#fff"/>
+
     </LinearLayout>
 
 </FrameLayout>

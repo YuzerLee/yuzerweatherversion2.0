@@ -1,1 +1,1 @@
-# yuzerweatherversion2.0
+# yuzerweather
